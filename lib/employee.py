@@ -1,4 +1,3 @@
-# lib/employee.py
 from __init__ import CURSOR, CONN
 from department import Department
 
@@ -187,4 +186,21 @@ class Employee:
 
     def reviews(self):
         """Return list of reviews associated with current employee"""
-        pass
+        # Import Review class here to avoid circular imports
+        from review import Review
+
+        # Query reviews table for rows associated with current employee
+        sql = """
+            SELECT *
+            FROM reviews
+            WHERE employee_id = ?
+        """
+        CURSOR.execute(sql, (self.id,))
+        rows = CURSOR.fetchall()
+
+        # Create Review instances for each row
+        reviews = []
+        for row in rows:
+            review = Review.instance_from_db(row)
+            reviews.append(review)
+        return reviews
